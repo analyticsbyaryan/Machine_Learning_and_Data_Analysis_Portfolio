@@ -1,5 +1,5 @@
 ---
-title: "Assignment_2 Business Analytics tools 2"
+title: "Predicting housing prices"
 output: html_notebook
 ---
 
