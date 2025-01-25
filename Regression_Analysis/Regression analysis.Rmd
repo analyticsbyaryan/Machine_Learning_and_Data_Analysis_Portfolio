@@ -1,0 +1,280 @@
+---
+title: "Assignment_2 Business Analytics tools 2"
+output: html_notebook
+---
+
+# Install packages and load libraries
+install.packages("stargazer")
+library(stargazer)
+
+install.packages("corrplot")
+library(corrplot)
+
+install.packages("ggplot2")
+install.packages("reshape2")
+library(ggplot2)
+library(reshape2)
+
+install.packages("car")
+library(car)
+
+# Load data into a data frame using read.csv()
+d <- read.csv(file = "D:/DEPAUL/QUARTER 5/BUSINESS ANALYTICS TOOLS - 2/ASSIGNMENT/ASSIGNMENT -2/housing.csv", header = FALSE,sep= '')
+
+# Define the column headers
+column_headers <- c("CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM","AGE", "DIS", "RAD", "TAX","PTRATIO","B", "LSTAT", "MEDV")
+
+# Assign the column headers to the data frame
+colnames(d) <- column_headers
+
+str(d)
+
+# Let's view the entire data set
+View(d)
+head(10)
+
+
+#summary for median value
+
+summary(d$MEDV)
+
+
+#histogram and qqplot of median value
+
+hist(d$MEDV)
+qqnorm(d$MEDV)
+qqline(d$MEDV, col = "steelblue")
+
+
+#log transformation of the Median value
+d$logMEDV <-  log(d$MEDV)
+hist(d$logMEDV)
+qqnorm(d$logMEDV)
+qqline(d$logMEDV, col = "steelblue")
+
+#tabulate CHAS
+table(d$CHAS)
+
+
+
+#LINEAR REGRESSION
+
+# Load necessary library
+#library(stargazer)
+
+# CRIM - per capita crime rate by town
+medv_crim <- lm(MEDV ~ CRIM, data = d)
+summary(medv_crim)
+stargazer(medv_crim, type = "text", title = "Effects of Crime Rate on Median")
+
+# ZN - proportion of residential land zoned for lots over 25,000 sq.ft.
+medv_zn <- lm(MEDV ~ ZN, data = d)
+summary(medv_zn)
+stargazer(medv_zn, type = "text", title = "Effects of Zoning on Median")
+
+# INDUS - proportion of non-retail business acres per town
+medv_indus <- lm(MEDV ~ INDUS, data = d)
+summary(medv_indus)
+stargazer(medv_indus, type = "text", title = "Effects of Industry on Median")
+
+# CHAS - Charles River dummy variable (1 if tract bounds river; 0 otherwise)
+medv_chas <- lm(MEDV ~ CHAS, data = d)
+summary(medv_chas)
+stargazer(medv_chas, type = "text", title = "Effects of Charles River Proximity on Median")
+
+# NOX - nitric oxides concentration (parts per 10 million)
+medv_nox <- lm(MEDV ~ NOX, data = d)
+summary(medv_nox)
+stargazer(medv_nox, type = "text", title = "Effects of Nitric Oxides on Median")
+
+# RM - average number of rooms per dwelling
+medv_rm <- lm(MEDV ~ RM, data = d)
+summary(medv_rm)
+stargazer(medv_rm, type = "text", title = "Effects of Rooms on Median")
+
+# AGE - proportion of owner-occupied units built prior to 1940
+medv_age <- lm(MEDV ~ AGE, data = d)
+summary(medv_age)
+stargazer(medv_age, type = "text", title = "Effects of Age on Median")
+
+# DIS - weighted distances to five Boston employment centres
+medv_dis <- lm(MEDV ~ DIS, data = d)
+summary(medv_dis)
+stargazer(medv_dis, type = "text", title = "Effects of Distance on Median")
+
+# RAD - index of accessibility to radial highways
+medv_rad <- lm(MEDV ~ RAD, data = d)
+summary(medv_rad)
+stargazer(medv_rad, type = "text", title = "Effects of Highway Accessibility on Median")
+
+# TAX - full-value property-tax rate per $10,000
+medv_tax <- lm(MEDV ~ TAX, data = d)
+summary(medv_tax)
+stargazer(medv_tax, type = "text", title = "Effects of Tax Rate on Median")
+
+# PTRATIO - pupil-teacher ratio by town
+medv_ptratio <- lm(MEDV ~ PTRATIO, data = d)
+summary(medv_ptratio)
+stargazer(medv_ptratio, type = "text", title = "Effects of Pupil-Teacher Ratio on Median")
+
+# B - 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+medv_b <- lm(MEDV ~ B, data = d)
+summary(medv_b)
+stargazer(medv_b, type = "text", title = "Effects of Proportion of Blacks on Median")
+
+# LSTAT - % lower status of the population
+medv_lstat <- lm(MEDV ~ LSTAT, data = d)
+summary(medv_lstat)
+stargazer(medv_lstat, type = "text", title = "Effects of Lower Status Population on Median")
+
+
+
+#MUTLIPLE REGRESSION USING SIGNIFICANT VARIABLES
+
+multiple <- lm(MEDV ~ CRIM + ZN + INDUS + CHAS + NOX + RM + AGE + DIS + RAD + TAX + PTRATIO + B + LSTAT, data = d)
+
+summary(multiple)
+
+stargazer(multiple, type = "text", title = "Effects of All Variables on Median")
+
+
+# INDUS AND AGE SEEMS TO BE INSIGNIFICANT BUILT A MODEL WITHOUT THEM
+
+medv_all <- lm(MEDV ~ CRIM + ZN + CHAS + NOX + RM + DIS + RAD + TAX + PTRATIO + B + LSTAT, data = d)
+
+summary(medv_all)
+
+stargazer(medv_all, type = "text", title = "Effects of All Variables on Median")
+
+
+
+
+# OLS ASSUMPTIONS CHECKS
+
+# HISTOGRAM OF RESIDUALS
+
+hist(medv_all$residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals")
+
+# RESIDUALS VS FITTED LINE
+plot(medv_all$fitted.values, medv_all$residuals,
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red")
+
+
+# Q-Q Plot
+qqnorm(medv_all$residuals)
+qqline(medv_all$residuals, col = "red")
+
+
+
+
+
+# CHECKING MULTICOLINEARITY
+
+
+# Calculate the correlation matrix for all explanatory variables
+correlation_matrix <- cor(medv_all$model)
+
+# Print the correlation matrix
+print(correlation_matrix)
+
+# Visualization of the correlation matrix
+
+# Create a data frame for the lower triangular matrix
+cor_data <- correlation_matrix 
+
+# set upper triangle values to null and do not include diagonal as part of upper triangle
+cor_data[upper.tri(cor_data, diag = FALSE)] <- NA 
+
+# converting wide format to long format for better graph making
+melted_corr <- melt(cor_data, na.rm = TRUE)
+
+
+# creation of heat map
+
+# mentioning data source, x-axis, y-axis, fill in correlation values
+ggplot(melted_corr, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  # label related settings
+  geom_text(aes(label = round(value, 2)), color = "black", size = 3) +  
+  scale_fill_gradient2(low = "purple", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1, 1), 
+                       name = "Correlation") +
+  theme_minimal() +
+  # labelling title and axes
+  labs(title = "Lower Triangular Correlation Heatmap", x = "", y = "") +
+  
+  # customize label text
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# VIF  CALCULATION
+
+vif_values <- vif(medv_all)
+vif_values
+
+# visualization of VIF values
+
+barplot(vif_values,
+        main = "Variance Inflation Factor (VIF) Values",
+        ylab = "VIF",
+        xlab = "Explanatory Variables",
+        col = "lightblue")
+
+abline(h = 5, col = "red", lty = 2)
+
+
+
+
+
+
+
+
+# REVISED MULTIPLE REGRESSION AFTER REMOVING VARIABLES WITH HIGH MULTICOLLINEARITY
+
+# RAD removed model
+mc_RAD_removed_model <- lm(MEDV ~ CRIM + ZN + CHAS + NOX + RM + DIS + TAX + PTRATIO + B + LSTAT, data = d)
+summary(mc_RAD_removed_model)
+
+stargazer(mc_RAD_removed_model, type = "text", title = "Effects of Variables on Median after removing RAD")
+
+
+
+
+
+# Q-Q Plot
+
+
+# TAX removed model
+
+mc_TAX_removed_model <- lm(MEDV ~ CRIM + ZN + CHAS + NOX + RM + DIS + RAD + PTRATIO + B + LSTAT, data = d)
+summary(mc_TAX_removed_model)
+
+stargazer(mc_TAX_removed_model, type = "text", title = "Effects of Variables on Median after removing variables with high multicollinearity")
+
+
+# PREDICTING THE MEDV
+
+#summary(d)
+
+
+## SCEANRIO 1 -Urban Renewal Project
+# CRIM: 1.5, ZN: 25.0, INDUS: 8.0, CHAS: 1, NOX: 0.4, RM: 6.8, AGE: 30.0, DIS: 3.5, RAD: 6, PTRATIO: 16, B: 200, LSTAT: 8
+
+predict(mc_TAX_removed_model, data.frame(CRIM = 1.5, ZN = 25.0, INDUS = 8.0, CHAS = 1, NOX = 0.4, RM = 6.8, AGE = 30.0, DIS = 3.5, RAD = 6, PTRATIO = 16, B = 200, LSTAT = 8.0))
+
+#SCENARIO 2 -Suburban Family Community
+#CRIM: 0.5, ZN: 50.0, INDUS: 4.0, CHAS: 0, NOX: 0.3, RM: 7.5, AGE: 15.0, DIS: 4.0, RAD: 3, PTRATIO: 14, B: 300, LSTAT: 5
+
+predict(mc_TAX_removed_model, data.frame(CRIM = 0.5, ZN = 50.0, INDUS = 4.0, CHAS = 0, NOX = 0.3, RM = 7.5, AGE = 15.0, DIS = 4.0, RAD = 3, PTRATIO = 14, B = 300, LSTAT = 5.0))
+
+
+#SCENARIO 3 - Aging Industrial Town
+#CRIM: 15.0, ZN: 5.0, INDUS: 20.0, CHAS: 0, NOX: 0.7, RM: 4.5, AGE: 70.0, DIS: 2.0, RAD: 2, PTRATIO: 19, B: 100, LSTAT: 30
+predict(mc_TAX_removed_model, data.frame(CRIM = 15.0, ZN = 5.0, INDUS = 20.0, CHAS = 0, NOX = 0.7, RM = 4.5, AGE = 70.0, DIS = 2.0, RAD = 2, PTRATIO = 19, B = 100, LSTAT = 30.0))
+
+
+#summary(d$MEDV)
+
